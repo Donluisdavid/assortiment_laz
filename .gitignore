@@ -1,0 +1,9 @@
+# Données et Modèles (Trop lourd pour Git)
+data/*.csv
+models/*.pkl
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
