@@ -22,7 +22,7 @@ class DataPreprocessor:
         # 1. Gestion des dates
         df['date'] = pd.to_datetime(df['date'])
         df['month'] = df['date'].dt.month
-        # df['year'] = df['date'].dt.year
+        df['year'] = df['date'].dt.year
 
         #2. Seasonalité
         df['is_winter']=np.where(np.isin(df['month'], [12,1,2]),1,0)
@@ -41,26 +41,26 @@ class DataPreprocessor:
         df['volume_lag_12'] = df.groupby(['agency', 'sku'])['volume'].shift(12)
         df.loc[df['volume_lag_12'].isna(),'volume_lag_12']=df.loc[df['volume_lag_12'].isna(),'volume']
 
-        # Pct du changement du prix actuel en fonction du prix actuel du mois précedent
-        df['price_actual_lag_1'] = df.groupby(['agency', 'sku'])['price_actual'].shift(1)
-        df.loc[df['price_actual_lag_1'].isna(),'price_actual_lag_1']=df.loc[df['price_actual_lag_1'].isna(),'price_actual']
-        df['pct_price_actual_lag_1'] = np.where(df['price_actual_lag_1']>0,(df['price_actual']-df['price_actual_lag_1'])/df['price_actual_lag_1'],0)
+        # # Pct du changement du prix actuel en fonction du prix actuel du mois précedent
+        # df['price_actual_lag_1'] = df.groupby(['agency', 'sku'])['price_actual'].shift(1)
+        # df.loc[df['price_actual_lag_1'].isna(),'price_actual_lag_1']=df.loc[df['price_actual_lag_1'].isna(),'price_actual']
+        # df['pct_price_actual_lag_1'] = np.where(df['price_actual_lag_1']>0,(df['price_actual']-df['price_actual_lag_1'])/df['price_actual_lag_1'],0)
 
-        # Pct du changement du prix regular en fonction du prix regular de l'année précédente (inflation à 1 an)
-        df['price_regular_lag_12'] = df.groupby(['agency', 'sku'])['price_regular'].shift(1)
-        df.loc[df['price_regular_lag_12'].isna(),'price_regular_lag_12']=df.loc[df['price_regular_lag_12'].isna(),'price_regular']
-        df['pct_price_regular_lag_12'] = np.where(df['price_regular_lag_12']>0,(df['price_regular']-df['price_regular_lag_12'])/df['price_regular_lag_12'],0)
+        # # Pct du changement du prix regular en fonction du prix regular de l'année précédente (inflation à 1 an)
+        # df['price_regular_lag_12'] = df.groupby(['agency', 'sku'])['price_regular'].shift(1)
+        # df.loc[df['price_regular_lag_12'].isna(),'price_regular_lag_12']=df.loc[df['price_regular_lag_12'].isna(),'price_regular']
+        # df['pct_price_regular_lag_12'] = np.where(df['price_regular_lag_12']>0,(df['price_regular']-df['price_regular_lag_12'])/df['price_regular_lag_12'],0)
 
         # On définit les colonnes que le modèle va utiliser
         self.features_cols = [
                 #'agency', 'sku', 
-                 'month', 'is_winter', 'is_springtime', 'is_summer', 'is_automn',  #'year',
-                 'easter_day','good_friday','new_year','christmas','labor_day','independence_day','revolution_day_memorial', 
-                 'regional_games','fifa_u_17_world_cup','football_gold_cup','beer_capital','music_fest',
-                 'avg_max_temp', ''
+                 'month', 'is_winter', 'is_springtime', 'is_summer', 'is_automn',  'year',
+                #  'easter_day','good_friday','new_year','christmas','labor_day','independence_day','revolution_day_memorial', 
+                #  'regional_games','fifa_u_17_world_cup','football_gold_cup','beer_capital','music_fest',
+                #  'avg_max_temp', 
                  'volume_lag_1', 'volume_lag_12', 
-                 'pct_price_regular_lag_12', 'pct_price_actual_lag_1',
-                 'discount_in_percent'
+                #  'pct_price_regular_lag_12', 'pct_price_actual_lag_1',
+                #  'discount_in_percent'
             ]
   
         return df
