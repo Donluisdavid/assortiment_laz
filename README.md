@@ -1,4 +1,4 @@
-# 🛒 Projet Store Adaptor : Prévision d'Assortiment (mon trigramme LAZ)
+# Projet Store Adaptor : Prévision d'Assortiment (mon trigramme LAZ)
 
 [![Python Version](https://img.shields.io/badge/python-3.12.10-blue.svg)](https://www.python.org/downloads/release/python-31210/)
 [![Framework](https://img.shields.io/badge/Model-LightGBM-orange.svg)](https://lightgbm.readthedocs.io/)

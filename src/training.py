@@ -67,7 +67,7 @@ class ModelTrainer:
         print(f"RMSE : {rmse:.2f}")
         print("--------------------------------------\n")
 
-    def save_model(self, features_cols, path):
+    def save_model(self, prepare_data, features_cols, path):
         """
         Sauvegarde l'artefact complet (Modèle + Preprocessor).
         """
@@ -75,6 +75,7 @@ class ModelTrainer:
         
         artifacts = {
             'model': self.model,
+            'preprocessor': prepare_data,
             'features': features_cols
         }
         

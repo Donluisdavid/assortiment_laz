@@ -42,12 +42,16 @@ def run_training():
     with open("models/features_cols.json", "r") as f:
         features_cols = json.load(f)
 
+    # 3. Preprocessing
+    print("On charge le preprocessor pour l'artifact")
+    prep = DataPreprocessor()
+
     # 4. Entraînement
     trainer = ModelTrainer()
     trainer.train(df_train, df_val, features_cols, target='volume')
 
     # 5. Sauvegarde
-    trainer.save_model( features_cols, MODEL_PATH)
+    trainer.save_model(prep.prepare_data, features_cols, MODEL_PATH)
 
       
 if __name__ == "__main__":
