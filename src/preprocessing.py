@@ -4,11 +4,6 @@ from sklearn.preprocessing import LabelEncoder
 import joblib
 
 class DataPreprocessor:
-    def __init__(self):
-        # On crée un dictionnaire pour stocker un encodeur par colonne
-        # self.encoders = {}
-        self.features_cols = []
-        # self.cat_features = ['agency', 'sku']
 
     def prepare_data(self, 
                      df, 
@@ -52,7 +47,7 @@ class DataPreprocessor:
         # df['pct_price_regular_lag_12'] = np.where(df['price_regular_lag_12']>0,(df['price_regular']-df['price_regular_lag_12'])/df['price_regular_lag_12'],0)
 
         # On définit les colonnes que le modèle va utiliser
-        self.features_cols = [
+        features_cols = [
                 #'agency', 'sku', 
                  'month', 'is_winter', 'is_springtime', 'is_summer', 'is_automn',  'year',
                 #  'easter_day','good_friday','new_year','christmas','labor_day','independence_day','revolution_day_memorial', 
@@ -63,7 +58,7 @@ class DataPreprocessor:
                 #  'discount_in_percent'
             ]
   
-        return df
+        return df, features_cols
     
     # def data_train_val_inference(self, df): 
     #     """Prépare les données pour l'entraînement, la validation, et l'inférence"""
