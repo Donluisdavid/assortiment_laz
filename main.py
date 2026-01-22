@@ -1,12 +1,13 @@
 import sys
 from src.preprocessing import DataPreprocessor
+from src.training import ModelTrainer
 import pandas as pd
 import os
 import json
 
 DATA_TRAIN_PATH = "data/train_set.csv"
 DATA_VAL_PATH = "data/val_set.csv"
-MODEL_PATH = "models/carrefour_model.pkl"
+MODEL_PATH = "models/model.pkl"
 
 def run_preprocessing():
     print("--- DÉMARRAGE DU PREPROCESSING ---")
@@ -36,18 +37,21 @@ def run_training():
     # 1. Chargement des données
     df_train = pd.read_csv(DATA_TRAIN_PATH)
     df_val = pd.read_csv(DATA_VAL_PATH)
+
+    # 2. Load training features 
+    with open("models/features_cols.json", "r") as f:
+        features_cols = json.load(f)
+
     # 4. Entraînement
     trainer = ModelTrainer()
-    features = prep.features_cols
-    trainer.train(train_df, val_df, features)
+    trainer.train(df_train, df_val, features_cols, target='volume')
 
     # 5. Sauvegarde
-    trainer.save_model(prep, MODEL_PATH)
+    trainer.save_model( features_cols, MODEL_PATH)
 
-    # 6. Export pour audit
-    train_df.to_csv("data/train_set.csv", index=False)
-    val_df.to_csv("data/validation_set.csv", index=False)
-    print("✅ Pipeline terminé avec succès.")  
       
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "training":
+        run_training()
+    else:
         run_preprocessing()

@@ -7,7 +7,6 @@ class DataPreprocessor:
 
     def prepare_data(self, 
                      df, 
-                    #  is_training=True
                      ):
         """
         Prépare les données : Features temporelles, saisonalité, et Lags.
@@ -59,16 +58,3 @@ class DataPreprocessor:
             ]
   
         return df, features_cols
-    
-    # def data_train_val_inference(self, df): 
-    #     """Prépare les données pour l'entraînement, la validation, et l'inférence"""
-    #     df = df.copy()
-    #     # On sépare les features et la target
-    #     X = df[self.features_cols]
-    #     y = df['volume']
-    #     return X, y
-
-
-    # def save_preprocessor(self, path):
-    #     """Sauvegarde les encodeurs pour l'inférence"""
-    #     joblib.dump(self, path)
