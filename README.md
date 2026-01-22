@@ -8,7 +8,7 @@ Ce projet implémente un moteur de prévision de ventes, dont l'objectif est d'o
 
 ---
 
-## 📝 1. Contexte et Problématique
+## 1. Contexte et Problématique
 
 Dans le secteur de la grande distribution, l'optimisation de l'assortiment est un levier majeur de performance. Un mauvais calibrage entraîne soit des ruptures de stock (manque à gagner), soit du surstock (coûts de stockage et gaspillage).
 
@@ -17,11 +17,11 @@ Dans le secteur de la grande distribution, l'optimisation de l'assortiment est u
 * L'élasticité au **prix** et l'impact des **promotions**.
 * Les facteurs externes (**météo**, jours fériés, inflation, etc).
 
-## ⚙️ 2. Approche de la Solution
+## 2. Approche de la Solution
 
 La solution repose sur une approche de **Machine Learning supervisé** utilisant l'algorithme **LightGBM**. Ce choix est motivé par sa rapidité d'entraînement, sa robustesse, entre autres.
 
-## 🧠 Stratégie de Prédiction : L'Inférence Récursive
+## Stratégie de Prédiction : L'Inférence Récursive
 
 Pour répondre au besoin de prévision à 4 mois, le projet utilise une stratégie **récursive** (ou *Iterative Forecasting*). 
 
@@ -36,7 +36,7 @@ Cela  permet de n'utiliser qu'un seul modèle robuste. Le principe est le suivan
 * **Simplicité opérationnelle :** Un seul modèle à entraîner, monitorer et déployer en production, réduisant ainsi la dette technique.
 * **Flexibilité :** Cette approche permet de changer l'horizon de prévision (passer de 4 à 6 mois par exemple) sans avoir à ré-entraîner de nouveaux modèles.
 
-## 📈 Stratégie des jeux de données de training, de validation, et d'inference 
+## Stratégie des jeux de données de training, de validation, et d'inference 
 
 Pour garantir la robustesse du modèle et sa capacité à généraliser sur des périodes futures, une stratégie de **split temporel** stricte a été adoptée. Contrairement à un découpage aléatoire, cette méthode respecte la chronologie des ventes et évite toute fuite de données (*Data Leakage*).
 
@@ -63,7 +63,7 @@ Le projet adopte une structure modulaire pour garantir une industrialisation pro
 
 ---
 
-## 🧪 3. Focus : Preprocessing & Feature Engineering
+## 3. Focus : Preprocessing & Feature Engineering
 
 La phase de preprocessing transforme les données brutes en signaux exploitables par le modèle.
 
@@ -78,7 +78,7 @@ La phase de preprocessing transforme les données brutes en signaux exploitables
 
 ---
 
-## 🛠 4. Installation et Utilisation Locale
+## 4. Installation et Utilisation Locale
 
 ### Pré-requis
 * **Python** 3.12.10

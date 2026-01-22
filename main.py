@@ -1,13 +1,19 @@
 import sys
 from src.preprocessing import DataPreprocessor
+from src.training import ModelTrainer
 import pandas as pd
+import os
+import json
 
+DATA_TRAIN_PATH = "data/train_set.csv"
+DATA_VAL_PATH = "data/val_set.csv"
+MODEL_PATH = "models/model.pkl"
 
-def run_train():
+def run_preprocessing():
     print("--- DÉMARRAGE DU PREPROCESSING ---")
-    df = pd.read_csv('data/ds_assortiment_dataset.csv')
+    df= pd.read_csv('data/ds_assortiment_dataset.csv')
     prep = DataPreprocessor()    
-    prep.prepare_data(df)
+    df, features_cols = prep.prepare_data(df)
     print("Succès : Data chargée, transformée, et loadée")
 
     print("--- SPLIT DES JEUX DE DONNEES TRAIN, VALIDATION, INFERENCE ---")
@@ -19,7 +25,33 @@ def run_train():
 
     inference_df = df[(df['date'] >= '2017-12-01')&(df['date'] <= '2017-12-31')]
     inference_df.to_csv("data/inference_set.csv", index=False)
+
+    # Sauvegarde dans un fichier JSON
+    with open("models/features_cols.json", "w") as f:json.dump(features_cols, f)
+
     print("Succès : sauvegardé")
 
+def run_training():
+    print("--- ENTRAÎNEMENT ---")
+    
+    # 1. Chargement des données
+    df_train = pd.read_csv(DATA_TRAIN_PATH)
+    df_val = pd.read_csv(DATA_VAL_PATH)
+
+    # 2. Load training features 
+    with open("models/features_cols.json", "r") as f:
+        features_cols = json.load(f)
+
+    # 4. Entraînement
+    trainer = ModelTrainer()
+    trainer.train(df_train, df_val, features_cols, target='volume')
+
+    # 5. Sauvegarde
+    trainer.save_model( features_cols, MODEL_PATH)
+
+      
 if __name__ == "__main__":
-        run_train()
+    if len(sys.argv) > 1 and sys.argv[1] == "training":
+        run_training()
+    else:
+        run_preprocessing()
