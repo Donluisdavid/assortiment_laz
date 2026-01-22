@@ -36,6 +36,22 @@ Cela  permet de n'utiliser qu'un seul modèle robuste. Le principe est le suivan
 * **Simplicité opérationnelle :** Un seul modèle à entraîner, monitorer et déployer en production, réduisant ainsi la dette technique.
 * **Flexibilité :** Cette approche permet de changer l'horizon de prévision (passer de 4 à 6 mois par exemple) sans avoir à ré-entraîner de nouveaux modèles.
 
+## 📈 Stratégie des jeux de données de training, de validation, et d'inference 
+
+Pour garantir la robustesse du modèle et sa capacité à généraliser sur des périodes futures, une stratégie de **split temporel** stricte a été adoptée. Contrairement à un découpage aléatoire, cette méthode respecte la chronologie des ventes et évite toute fuite de données (*Data Leakage*).
+
+| Set | Période | Objectif Business |
+| :--- | :--- | :--- |
+| **Entraînement (Train)** | 2013 — Nov. 2016 | Apprentissage des tendances de fond, des élasticités prix et des comportements historiques. |
+| **Validation** | Déc. 2016 — Nov. 2017 | **Cycle annuel complet** : Test de la performance du modèle sur une année entière pour valider la gestion de la saisonnalité (Noël, été, promos). |
+| **Inférence (Test)** | Décembre 2017 | Point de départ ("Seed") de la donnée fraîche pour projeter les prévisions récursives sur l'horizon 2018. |
+
+
+
+### Pourquoi ce choix ?
+1. **Validation sur 12 mois** : En utilisant une fenêtre de validation d'un an, nous nous assurons que les hyperparamètres du modèle ne sont pas sur-optimisés pour une seule saison, mais pour la réalité annuelle du secteur retail.
+2. **Réalisme opérationnel** : Le passage au set d'inférence en Décembre 2017 simule exactement le comportement du pipeline en production dans la grande distribution : utiliser le dernier mois consolidé pour prévoir les mois à venir.
+
 ### Architecture du Projet
 Le projet adopte une structure modulaire pour garantir une industrialisation propre :
 * `src/preprocessing.py` : Nettoyage et ingénierie des caractéristiques (Features).
