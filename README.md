@@ -73,10 +73,7 @@ La phase de preprocessing transforme les données brutes en signaux exploitables
     * `Lag_12` : Volume du même mois l'année précédente (saisonnalité annuelle).
 * **Variables Calendaires :** Flags binaires pour les événements majeurs (Noël, Labour Day).
 
-### Encodage Catégoriel
-Les identifiants `agency` et `sku` sont transformés via un **LabelEncoder**. 
-> **Note de Lead :** Les encodeurs sont sauvegardés dans l'artefact final (`.pkl`) pour garantir que l'ID "12" corresponde au même magasin lors de l'entraînement et de l'inférence (évite le *Training-Serving Skew*).
-
+"hypothèse de remplissage des données manquantes"
 
 
 ---
