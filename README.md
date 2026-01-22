@@ -110,5 +110,5 @@ Entraînement :
     ```
     bash python main.py
 
-    *(Génère le modèle dans `models/model_assortissement.pkl`)*
+    *(Transforme le fichier d'entrée, pour obtenir les jeux de données de train, validation, et inference)*
 
