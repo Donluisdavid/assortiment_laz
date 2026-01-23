@@ -41,5 +41,7 @@ class DataPreprocessor:
                  'month', 'is_winter', 'is_springtime', 'is_summer', 'is_automn',  'year',
                  'volume_lag_1', 'volume_lag_12', 
             ]
+        
+        df=df[['date','agency','sku','volume'] + features_cols]
   
         return df, features_cols

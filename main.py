@@ -1,6 +1,7 @@
 import sys
 from src.preprocessing import DataPreprocessor
 from src.training import ModelTrainer
+from src.inference import run_recursive_inference
 import pandas as pd
 import os
 import json
@@ -8,6 +9,8 @@ import json
 DATA_TRAIN_PATH = "data/train_set.csv"
 DATA_VAL_PATH = "data/val_set.csv"
 MODEL_PATH = "models/model.pkl"
+INFERENCE_PATH = "data/inference_set.csv"
+PREDICTIONS_PATH = "data/final_predictions.csv"
 
 def run_preprocessing():
     print("--- DÉMARRAGE DU PREPROCESSING ---")
@@ -51,11 +54,29 @@ def run_training():
     trainer.train(df_train, df_val, features_cols, target='volume')
 
     # 5. Sauvegarde
-    trainer.save_model(prep.prepare_data, features_cols, MODEL_PATH)
+    trainer.save_model(prep, features_cols, MODEL_PATH)
+
+
+def run_inference():
+    print("INFERENCE RÉCURSIVE")
+    
+    # Dernier état connu des couples agency/sku
+    df_inference = pd.read_csv(INFERENCE_PATH)
+        
+    # Appel de la fonction récursive du forecasting (à 4 mois)
+    run_recursive_inference(
+        df_inference=df_inference,
+        output_csv=PREDICTIONS_PATH,
+        model_path=MODEL_PATH
+    )
+
+    print(f"Prévisions M+1 à M+4 générées dans {PREDICTIONS_PATH}")
 
       
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "training":
         run_training()
+    elif len(sys.argv) > 1 and sys.argv[1] == "inference":
+        run_inference()
     else:
         run_preprocessing()

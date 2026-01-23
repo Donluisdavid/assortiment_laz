@@ -58,7 +58,7 @@ class ModelTrainer:
         print(f"MAE  : {mae:.2f}")
         print(f"RMSE : {rmse:.2f}")
 
-        print("\n---PERFORMANCES SUR VALIDATION ---")
+        print("PERFORMANCES SUR VALIDATION")
         preds = self.model.predict(X_val)
         mae = mean_absolute_error(y_val, preds)
         rmse = np.sqrt(mean_squared_error(y_val, preds))
@@ -67,17 +67,17 @@ class ModelTrainer:
         print(f"RMSE : {rmse:.2f}")
         print("--------------------------------------\n")
 
-    def save_model(self, prepare_data, features_cols, path):
+    def save_model(self, prep, features_cols, path):
         """
-        Sauvegarde l'artefact complet (Modèle + Preprocessor).
+        Sauvegarde l'artefact complet (Modèle + Preprocessor + Featuress).
         """
         os.makedirs(os.path.dirname(path), exist_ok=True)
         
         artifacts = {
             'model': self.model,
-            'preprocessor': prepare_data,
+            'preprocessor': prep,
             'features': features_cols
         }
-        
+
         joblib.dump(artifacts, path)
         print(f"Artefact sauvegardé avec succès dans : {path}")
