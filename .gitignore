@@ -6,3 +6,11 @@ models/*
 __pycache__/
 *.pyc
 .venv/
+
+# Métadonnées du package
+*.egg-info/
+
+# Tests et Couverture
+.coverage
+htmlcov/
+.pytest_cache/
