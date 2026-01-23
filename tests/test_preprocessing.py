@@ -21,7 +21,7 @@ def test_prepare_data_logic():
     prep = DataPreprocessor()
     
     # 2. ACT : On applique le preprocessing
-    result = prep.prepare_data(df_test)
+    result,features_cols = prep.prepare_data(df_test)
     
     # 3. ASSERT : On vérifie les résultats
     # Vérification des colonnes temporelles
@@ -38,8 +38,8 @@ def test_prepare_data_logic():
     assert result['volume_lag_1'].iloc[1] == 100 
     
     # Vérification de la liste des features
-    assert 'is_winter' in prep.features_cols
-    assert 'volume_lag_12' in prep.features_cols
+    assert 'is_winter' in features_cols
+    assert 'volume_lag_12' in features_cols
 
 def test_feature_columns_consistency():
     """Vérifie que la liste des features n'est pas vide après processing."""
@@ -47,6 +47,6 @@ def test_feature_columns_consistency():
         'date': ['2023-01-01'], 'agency': ['A'], 'sku': ['S1'], 'volume': [10]
     })
     prep = DataPreprocessor()
-    _ = prep.prepare_data(df_test)
+    _, features_cols = prep.prepare_data(df_test)
     
-    assert len(prep.features_cols) > 0
+    assert len(features_cols) > 0
