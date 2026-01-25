@@ -8,11 +8,13 @@ Ce projet implémente un moteur de prévision de ventes, dont l'objectif est d'o
 
 ---
 
-## 1. Contexte et Problématique
+## 1. Contexte et objectifs
 
-Dans le secteur de la grande distribution, l'optimisation de l'assortiment est un levier majeur de performance. Un mauvais calibrage entraîne soit des ruptures de stock, soit du surstock.
+Dans le secteur de la grande distribution, l'optimisation de l'assortiment est un levier majeur de performance. Une mauvaise estimation du volume de ventes entraîne deux risques majeurs :
+* **La Rupture de Stock** : Perte directe de chiffre d'affaires et dégradation de l'expérience client.
+* **Le Sur-stockage** : Immobilisation de capital et risque de gaspillage (démarque), particulièrement sur les produits frais.
 
-**Le défi :** Prédire avec précision les volumes de ventes à horizon 4 mois pour chaque couple magasin (**Agency**) / produit (**SKU**), en tenant compte de.
+Ce projet propose un prototype d'un **pipeline de forecasting automatisé** capable de prédire les volumes de ventes, pour chaque couple magasin (**Agency**) / produit (**SKU**), sur un horizon de **4 mois**. Cet outil permet aux gestionnaires d'assortiment d'anticiper les tendances saisonnières et d'ajuster les approvisionnements de manière proactive.
 
 ## 2. Approche de la Solution
 
@@ -40,7 +42,7 @@ Pour garantir la robustesse du modèle et sa capacité à généraliser sur des 
 | Set | Période | Objectif Business |
 | :--- | :--- | :--- |
 | **Entraînement** | 2013 — Nov. 2016 | Apprentissage des tendances de fond et des comportements historiques. |
-| **Validation** | Déc. 2016 — Nov. 2017 | **Cycle annuel complet** : Test de la performance du modèle sur une année entière pour valider la gestion de la saisonnalité (Noël, été, promos). |
+| **Validation** | Déc. 2016 — Nov. 2017 | **Cycle annuel complet** : Test de la performance du modèle sur une année entière pour valider la gestion de la saisonnalité (Noël, été, promos), pour éviter toute fuite de données (Data Leakage) et garantir la fiabilité des prévision futures. |
 | **Inférence** | Décembre 2017 | Point de départ de la donnée fraîche pour projeter les prévisions récursives sur l'horizon 2018. |
 
 #### Pourquoi ce choix pour le set d'inférence?
@@ -122,35 +124,19 @@ Fichier CSV avec le format
 
 ---
 
-## 4. Installation 
+## 4. Installation et execution
 
 ### Pré-requis
-La configuration est centralisée dans un pyproject.toml. Cela permet de gérer les dépendances, ainsi que standardiser les outils de qualité de code comme pytest dans un seul fichier de configuration.
+La configuration est centralisée dans un pyproject.toml. Cela permet de gérer les dépendances d'une façon moderne, ainsi que standardiser les outils de qualité de code comme pytest dans un seul fichier de configuration.
 
 * **Environnement virtuel** recommandé.
 
-### Configuration
-1. **Cloner le projet :**
+1. **Quick start :**
    ```bash
-   git clone [https://github.com/Donluisdavid/assortiment_laz.git](https://github.com/Donluisdavid/assortiment_laz.git)
-   cd assortiment_laz
+   git clone https://github.com/Donluisdavid/assortiment_laz.git
+   pip install .
 
-2. **Créer et activer l'environnement :**
-
-    ```bash
-    python -m venv .venv
-    source .venv/Scripts/activate
-
-3. **Installer les dépendances :** 
-
-    ```bash 
-    pip install .
-
-4. **Installer avec les outils de dveloppement (testt, linting) :**
-    ```bash
-    pip install -e .[dev]
-
-## 5. **Exécution**
+### **Exécution**
 Elle est divisé en 3 : preprocessing, training, et inference.
 
 1. **Preprocessing**
@@ -171,11 +157,11 @@ Elle est divisé en 3 : preprocessing, training, et inference.
     bash python main.py inference
     *(prend le fichier d'inférence, génère les prédictions, et les dépose dans le dossier data)
 
-## 6. Tests et Qualité
+## 5. Tests et Qualité
 
 Le projet suit les standards de développement avec une suite de tests automatisés. La configuration est centralisée dans le fichier `pyproject.toml`.
 
-### 1. Exécution des Tests
+### Exécution des Tests
 Nous utilisons `pytest` pour valider la logique des transformations (preprocessing) et la robustesse de l'inférence.
 
     ```
@@ -184,6 +170,10 @@ Nous utilisons `pytest` pour valider la logique des transformations (preprocessi
     *(Lance tous les codes unitaires)*
 
 Grâce à pytest-cov, un rapport de couverture est généré automatiquement pour s'assurer que les parties critiques du pipeline sont bien testées.
+
+Pour l'instant, j'ai réalisé qu'un test pour le pre processing, vue les contraintes temporaires. Les tests pour le training et l'inférence viendront bientôt. 
+
+## 7. Evolutions possibles
 
 
 
