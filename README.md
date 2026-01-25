@@ -4,7 +4,7 @@
 [![Framework](https://img.shields.io/badge/Model-LightGBM-orange.svg)](https://lightgbm.readthedocs.io/)
 [![CI/CD](https://img.shields.io/badge/CI-GitHub%20Actions-green.svg)](https://github.com/features/actions)
 
-Ce projet implémente un moteur de prévision de ventes, dont l'objectif est d'optimiser l'assortiment magasin en anticipant les volumes de ventes à 4 mois.
+Ce projet implémente un moteur de prévision de ventes, pour optimiser l'assortiment magasin en anticipant les volumes de ventes à 4 mois.
 
 ---
 
@@ -48,18 +48,14 @@ Pour garantir la robustesse du modèle et sa capacité à généraliser sur des 
 #### Pourquoi ce choix pour le set d'inférence?
 Vue que sur le jeu de données, il n'y a qu'une seule ligne par date/agency/sku, et que Décembre 2017 est la dernière date renseignée, alors, ce choix simule exactement le comportement du pipeline en production : utiliser le dernier mois consolidé pour prévoir les mois à venir.
 
-### Architecture du Projet
+## 3. Architecture et étapes du projet
 Le projet adopte une structure modulaire pour garantir une industrialisation propre :
 * `src/preprocessing.py` : Nettoyage et ingénierie des caractéristiques (features).
 * `src/training.py` : Logique d'entraînement et sérialisation du modèle.
 * `src/inference.py` : Moteur de prédiction récursive à 4 mois.
 * `main.py` : Orchestrateur central du pipeline.
 
----
-
-## 3. Preprocessing, training, inference
-
-### Preprocessing & Feature Engineering
+### a) Preprocessing & Feature Engineering
 
 La phase de preprocessing transforme les données brutes en signaux exploitables. Compte tenu de l'approche récursive choisie, le périmètre des variables a été sélectionné selon leur capacité à être projetées dans le futur (itérations $M+n$).
 
@@ -75,16 +71,16 @@ Pour expliquer le volume future de ventes, on a retenu que les variables **volum
     Celles ci sont calculées par couple sku/agency, pour garder certaine cohérence. Des règles de gestions de nulls très simples ont été mises en place. Dans un contexte industriel, d'autres méthodes plus réalistes seraient utilisés.
 * **Variables Calendaires :** Flags binaires pour les événements majeurs (is_winter, is_springtime, etc).
 
-#### Arbitrages sur le périmètre des variables
-Certaines variables présentes dans le dataset n'ont pas été incluses dans ce prototype pour des raisons de conception :
+#### Disclaimer sur le périmètre des variables
+Certaines variables présentes dans le dataset n'ont pas été incluses pour des raisons de conception :
 
 * **Variables Commerciales (price, discount) :** bien que critiques, leur utilisation en mode récursif nécessiterait de connaître le plan promotionnel futur. À défaut de ces données prospectives, elles ont été écartées pour éviter de biaiser les itérations futures avec des valeurs statiques.
 
-* **Événements Spécifiques (Fêtes, Calendrier Sportif) :** ces variables du type **temps Forts** sont très impactantes mais nécessitent des règles de gestion précises (dates mobiles comme Pâques). Par souci de robustesse pour ce test, nous avons privilégié des variables calendaires déterministes.
+* **Événements Spécifiques (Fêtes, Calendrier Sportif) :** ces variables du type **temps Forts** sont très impactantes, mais nécessitent les règles de gestion utilisées pour les construire, vue l'approche itérative. En manque de ces règles, nous avons privilégié des variables calendaires déterministes.
 
 * **Identifiants (sku, agency) :** Plutôt que d'utiliser des IDs bruts (qui posent des problèmes de scalabilité et de gestion des nouvelles références en production), j'ai privilégié une approche basée sur le comportement des séries temporelles. En milieu industriel, il est préférable de remplacer ces IDs par des caractéristiques métiers (catégories, formats de magasin) pour favoriser la généralisation du modèle.
 
-### Stratégie d'apprentissage (training)
+### b) Stratégie d'apprentissage (training)
 
 La variable cible est le **volume de ventes mensuel**. C'est à dire :
 
@@ -102,7 +98,7 @@ Plutôt que d'entraîner un modèle par produit/magasin, nous utilisons un modè
 
 ** Gestion des artefacts : à l'issue de l'entraînement, un objet structuré ("artifact") est sauvegardé, avec toutes les composants nécessaires à l'inférence : **le model, le data preprocessor, et le schema des features**.
 
-### Stratégie d'inférence
+### c) Stratégie d'inférence
 L'inférence est conçue pour produire des prévisions sur un horizon de 4 mois. Étant donné que le modèle utilise des variables retardées (lags), nous appliquons une stratégie itérative :
 
 * Le dernier état connu du jeu de données,
@@ -139,21 +135,20 @@ La configuration est centralisée dans un pyproject.toml. Cela permet de gérer 
    pip install .
 
 ### **Exécution**
-Elle est divisé en 3 : preprocessing, training, et inference.
 
-1. **Preprocessing**
+**Preprocessing**
 
     ```
     bash python main.py
     *(Transforme le fichier d'entrée, pour obtenir les jeux de données de train, validation, et inference dans le dossier data)*
 
-2. **Training**
+**Training**
 
     ```
     bash python main.py training
-    *(Génère l'artifact du modèle dans le dossier models)*
+    *(Génère l'artefact d'entrainement le dossier models)*
 
-3. **Inference**
+**Inference**
 
     ```
     bash python main.py inference
@@ -175,9 +170,9 @@ Grâce à pytest-cov, un rapport de couverture est généré automatiquement pou
 
 Pour l'instant, j'ai réalisé qu'un test pour le pre processing, vue les contraintes temporaires. Les tests pour le training et l'inférence viendront bientôt. 
 
-## 7. Axes d'amélioration et perspectives
+## 6. Axes d'amélioration et perspectives
 
-### Segmentation et stratégies de modélisation 
+### a) Segmentation et stratégies de modélisation 
 
 Dans un contexte industriel réel, traiter l'ensemble des références avec un modèle unique est sous-optimal. Une approche plus fine consisterait à segmenter le catalogue pour adapter la granularité et l'algorithme :
 
@@ -192,7 +187,7 @@ Dans un contexte industriel réel, traiter l'ensemble des références avec un m
 * **Articles "Erratiques" (Faibles ventes/Faible fréquence) :**
     * Stratégie : Modélisation simplifiée ou gestion par stock de sécurité (approche statistique de Poisson) plutôt que par ML pur.
 
-### Enrichissement du périmètre des features.
+### b) Enrichissement du périmètre des features.
 Des familles plus larges de signaux peuvent être considérées dans la modélisation, pour accroître la précision de la solution. 
 
 La méthode itérative a fait qu'on a du éviter d'utiliser certaines des variables dans le jeu de données. Cependant, c'est totalement possible de regarder variable par variable si on peut connaitre en avance ses valeurs, avoir un proxy, voire si on peut les prédire. Mais peut être cette donnée peut déjà exister dans d'autres projets en interne. En tout cas, vu que très probablement dans la réalité on devoir donner les prédictions des 4 prochains mois (plutôt ça sera des prédictions des ventes dans les jours à venir), ça sera plus simple. 
@@ -203,7 +198,7 @@ La méthode itérative a fait qu'on a du éviter d'utiliser certaines des variab
  * **Variables provenant du calendrier** : Au-delà de la saisonnalité mensuelle, intégrer les "temps forts" du retail : vacances scolaires, jours fériés mobiles (Pâques, Ramadan) et événements sportifs majeurs.
  * **Calendrier concurrenciel** : Identifier les ouvertures/fermetures de concurrents directs ou les opérations commerciales majeures de la zone de chalandise.
 
-### Evolution stratégique de la modélisation
+### c) Evolution stratégique de la modélisation
 
 L'approche actuelle repose sur un modèle de Machine Learning (Gradient Boosting). Bien que performante pour capter des relations non linéaires complexes, cette approche peut être enrichie pour mieux appréhender la structure temporelle des ventes.
 
@@ -225,7 +220,7 @@ Pour gérer des volumes de données massifs, l'exploration d'architectures de De
 * **LSTM / GRU :** Pour capter des dépendances temporelles à long terme.
 * Temporal Fusion Transformers (TFT) : Pour une approche à l'état de l'art capable de gérer des horizons de prédiction multiples tout en restant interprétable.
 
-### Entrainement
+### d) Entrainement
 
 Pour transformer ce prototype en un modèle de production performant, plusieurs axes d'amélioration technique sont envisagés :
 
@@ -233,7 +228,7 @@ Pour transformer ce prototype en un modèle de production performant, plusieurs 
 * Optimistaion de hyperparamètres via **Optuna**, pour ajuste finement les paramètres du LightGBM,
 * Réduction de dimensionnalité, avec des méthodes des réduction de variables, pour éliminer les bruits et améliorer la capacité de généralisation du modèle. 
 
-### Raffinement des métriques de performance
+### e) Raffinement des métriques de performance
 Le RMSE, bien que robuste mathématiquement, doit être complété par des indicateurs plus proches des réalités logistiques :
 
 * **WAPE (Weighted Absolute Percentage Error) :** pour offrir une mesure de l'erreur en pourcentage, facilitant l'interprétation par les équipes métier.
@@ -242,7 +237,7 @@ Le RMSE, bien que robuste mathématiquement, doit être complété par des indic
 
 * **Intervalles de Confiance (Quantile Regression) :** Au lieu d'une prédiction ponctuelle, produire des intervalles (ex: Quantiles 10% et 90%) pour permettre aux gestionnaires de stock de définir des stocks de sécurité basés sur le risque.
 
-### Vers une industrialisation MLOps
+### f) Vers une industrialisation MLOps
 Pour garantir la pérennité et la fiabilité de la solution en production, le pipeline devrait évoluer vers une architecture MLOps complète, structurée autour de l'automatisation et de l'observabilité :
 
 #### Automatisation du cycle de vie (CI/CD/CT)
@@ -261,7 +256,7 @@ Intégrer un dashboard de monitoring focalisé sur la santé opérationnelle du 
 * **Analyse de l'asymétrie :** uivi temps réel des taux d'**over-forecasting** et d'**under-forecasting** pour alerter les équipes logistiques.
 * **Backtesting glissant :** Évaluation continue de la fiabilité des intervalles de confiance pour ajuster dynamiquement les stocks de sécurité.confiance, etc.  
 
-### Aide à la décision et opérationnalisation
+### g) Aide à la décision et opérationnalisation
 Pour favoriser l'adoption du modèle par les équipes métier (gestionnaires d'assortiment et approvisionneurs), la restitution des résultats doit évoluer :
 
 #### Transition vers des prévisions probabilistes
@@ -270,15 +265,15 @@ Fournir une valeur unique (moyenne) est souvent insuffisant pour la gestion des 
 * **Réassurance Métier** : Un intervalle backtesté et fiable renforce la confiance des utilisateurs dans les prédictions du modèle.
 
 #### Dashboards d'exception (management by exception)
-Plutôt que de demander aux équipes de vérifier chaque ligne, le système peut alerter uniquement sur les anomalies de prévision ou les changements brusques de tendance, permettant aux opérationnels de se concentrer sur les références à fort enjeu.
+Plutôt que de demander aux équipes de vérifier chaque ligne, le système peut alerter uniquement sur les anomalies de prévision ou les changements brusques de tendance, permettant aux opérationnels de se concntrer sur les références à fort enjeu.
 
-## Architecture Cible sur Google Cloud Platform (GCP)
+### h) Architecture Cible sur Google Cloud Platform (GCP)
 
 Pour industrialiser ce projet sur GCP, je m'appuierais sur Vertex AI.
 
 * **Orchestration & Entraînement :** Vertex AI Pipelines pour automatiser l'enchaînement des tâches (préparation des données -> entraînement -> inférence). Le déclenchement serait planifié (*scheduling*) pour s'exécuter périodiquement (ex: chaque jour ou chaque semaine).
 
-* ** Stockage :**
+* **Stockage :**
 
     * **Données :** Idéalement, toute la data serait stockés dans BigQuery.
     * **Modèles :** Le modèle final (.pkl) serait sauvegardé dans le Vertex AI Model Registry, pour gérer les différentes versions.
